@@ -15,7 +15,7 @@ export function Storefront({ products }: { products: Product[] }) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(products[0] || null);
 
   const featuredProducts = useMemo(
-    () => products.filter((product) => product.featured).length ? products.filter((product) => product.featured) : products,
+    () => (products.filter((product) => product.featured).length ? products.filter((product) => product.featured) : products),
     [products]
   );
 
@@ -38,12 +38,12 @@ export function Storefront({ products }: { products: Product[] }) {
               transition={{ duration: 0.9, ease: 'easeOut' }}
               className="max-w-3xl"
             >
-              <p className="mb-5 text-xs uppercase tracking-[0.36em] text-white/45">Casablanca / monochrome oversized identity</p>
+              <p className="mb-5 text-xs uppercase tracking-[0.36em] text-white/45">Casablanca / oversized essentials</p>
               <h1 className="text-balance text-[3.4rem] font-semibold uppercase leading-[0.88] tracking-[-0.04em] text-white sm:text-[4.7rem] md:text-[6.4rem] xl:text-[7.6rem]">
                 LMAJHOL
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-white/66 sm:text-lg">
-                Blanc. Noir. Coupe ample. Une expérience 3D pensée comme une entrée de défilé pour vendre vos essentiels oversized avec paiement à la livraison au Maroc.
+                T-shirts oversized noirs et blancs, coupe ample, présence clean et livraison avec paiement à la réception.
               </p>
 
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -69,28 +69,28 @@ export function Storefront({ products }: { products: Product[] }) {
               className="panel rounded-[2rem] p-6 shadow-glow lg:ml-auto lg:max-w-md"
             >
               <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Opening scene</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Signature</p>
                 <Sparkles className="h-4 w-4 text-white/65" />
               </div>
               <div className="mt-6 space-y-6">
                 <div>
-                  <p className="text-4xl font-semibold text-white">Scroll = mouvement</p>
+                  <p className="text-4xl font-semibold text-white">Minimal. Large. Fort.</p>
                   <p className="mt-3 text-sm leading-6 text-white/62">
-                    Les pièces flottent, la caméra avance et l’univers change au scroll pour donner un sentiment de marque plus premium qu’un simple catalogue.
+                    Une expérience visuelle sombre et élégante pour mettre la coupe oversized au centre de la marque.
                   </p>
                 </div>
                 <div className="grid gap-3 text-sm text-white/60 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Mood</p>
-                    <p className="mt-2 text-white">Runway</p>
+                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Style</p>
+                    <p className="mt-2 text-white">Oversized</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
                     <p className="text-xs uppercase tracking-[0.28em] text-white/38">Palette</p>
                     <p className="mt-2 text-white">Noir / Blanc</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Flow</p>
-                    <p className="mt-2 text-white">COD + Telegram</p>
+                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Livraison</p>
+                    <p className="mt-2 text-white">Paiement à la réception</p>
                   </div>
                 </div>
               </div>
@@ -103,18 +103,18 @@ export function Storefront({ products }: { products: Product[] }) {
             {[
               {
                 title: 'Paiement simple',
-                text: 'Commande directe avec formulaire clair, pensé pour le cash à la livraison.',
+                text: 'Commande rapide avec vos coordonnées et paiement à la livraison.',
                 icon: ShieldCheck
               },
               {
-                title: 'Alerte Telegram',
-                text: 'Chaque commande arrive dans votre bot Telegram avec les détails client.',
-                icon: ArrowUpRight
+                title: 'Coupe oversized',
+                text: 'Des essentiels pensés pour une silhouette ample, nette et moderne.',
+                icon: Package
               },
               {
-                title: 'Admin privé',
-                text: 'Tableau de bord admin pour gérer les produits plus tard sans toucher au design.',
-                icon: Package
+                title: 'Commande rapide',
+                text: 'Choisissez votre couleur, votre taille et validez en quelques secondes.',
+                icon: ArrowUpRight
               }
             ].map((item, index) => (
               <motion.div
@@ -141,7 +141,7 @@ export function Storefront({ products }: { products: Product[] }) {
                 <h2 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">L’essentiel oversized, sans bruit.</h2>
               </div>
               <p className="max-w-xl text-sm leading-7 text-white/58">
-                Démarre avec deux pièces fortes — blanc et noir — puis ajoute les prochains produits depuis l’admin. Le design reste premium même si tu fais évoluer le catalogue.
+                Deux coloris forts, une coupe ample et un look monochrome pensé pour être porté tous les jours.
               </p>
             </div>
 
@@ -211,10 +211,10 @@ export function Storefront({ products }: { products: Product[] }) {
               viewport={{ once: true, amount: 0.35 }}
               className="panel rounded-[2rem] p-8"
             >
-              <p className="text-xs uppercase tracking-[0.32em] text-white/40">Direction</p>
-              <h2 className="mt-5 text-4xl font-semibold text-white">Une marque petite, mais une présence grande.</h2>
+              <p className="text-xs uppercase tracking-[0.32em] text-white/40">L’esprit LMAJHOL</p>
+              <h2 className="mt-5 text-4xl font-semibold text-white">Une présence simple, propre et forte.</h2>
               <p className="mt-5 max-w-xl text-sm leading-7 text-white/58">
-                Le site prend une direction galerie / fashion-show : peu d’éléments, plus de matière, du mouvement contrôlé, une narration visuelle concentrée sur la coupe, le contraste et la présence du vêtement.
+                Noir profond, blanc net, volumes amples et rythme visuel minimal pour laisser la coupe parler d’elle-même.
               </p>
             </motion.div>
 
@@ -222,23 +222,23 @@ export function Storefront({ products }: { products: Product[] }) {
               {[
                 {
                   label: '01',
-                  title: 'Hero 3D cinématique',
-                  text: 'Les t-shirts sculptés flottent dans un espace noir, la caméra avance au scroll et renforce l’effet premium.'
+                  title: 'Coupe ample',
+                  text: 'Des proportions larges pour un tombé confortable et une silhouette moderne.'
                 },
                 {
                   label: '02',
-                  title: 'Formulaire orienté conversion',
-                  text: 'Pas de tunnel compliqué : sélection, infos client, confirmation, puis envoi Telegram.'
+                  title: 'Palette monochrome',
+                  text: 'Blanc et noir pour rester clean, facile à porter et facile à associer.'
                 },
                 {
                   label: '03',
-                  title: 'Admin sécurisé',
-                  text: 'Accès protégé par mot de passe avec CRUD produit prêt pour Supabase.'
+                  title: 'Détails sobres',
+                  text: 'Peu d’éléments, peu de bruit visuel, plus d’impact sur la présence générale.'
                 },
                 {
                   label: '04',
-                  title: 'Évolutif',
-                  text: 'Tu peux changer les visuels, les prix, les tailles et ajouter de nouvelles références plus tard.'
+                  title: 'Commande directe',
+                  text: 'Choisissez votre modèle, laissez vos informations et confirmez votre commande rapidement.'
                 }
               ].map((item, index) => (
                 <motion.div
@@ -264,10 +264,10 @@ export function Storefront({ products }: { products: Product[] }) {
               <div>
                 <p className="text-xs uppercase tracking-[0.35em] text-white/40">Commande / Maroc</p>
                 <h2 className="mt-5 max-w-3xl text-4xl font-semibold text-white sm:text-5xl">
-                  Active la vente maintenant, puis fais évoluer les produits plus tard.
+                  Choisissez votre tee et passez votre commande en quelques instants.
                 </h2>
                 <p className="mt-5 max-w-2xl text-sm leading-7 text-white/58">
-                  Le site est prêt pour une première version forte. Tu peux démarrer avec les deux t-shirts, recevoir les commandes sur Telegram, puis brancher Supabase pour gérer tout ton catalogue en admin privé.
+                  Sélectionnez votre couleur, votre taille, vos coordonnées, puis validez. Nous vous recontacterons pour confirmer.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -278,10 +278,10 @@ export function Storefront({ products }: { products: Product[] }) {
                   Ouvrir le formulaire
                 </button>
                 <a
-                  href="/admin/login"
+                  href="#collection"
                   className="rounded-full border border-white/16 bg-white/5 px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
                 >
-                  Accès admin
+                  Voir les produits
                 </a>
               </div>
             </div>
@@ -292,7 +292,7 @@ export function Storefront({ products }: { products: Product[] }) {
       <footer className="px-6 pb-8 lg:px-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-xs uppercase tracking-[0.28em] text-white/35 sm:flex-row sm:items-center sm:justify-between">
           <p>LMAJHOL — Oversized essentials</p>
-          <p>Cash à la livraison / admin privé / Telegram ready</p>
+          <p>Noir / Blanc / Paiement à la réception</p>
         </div>
       </footer>
 

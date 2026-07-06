@@ -234,7 +234,7 @@ export function OrderModal({
             </label>
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/58">
-              Paiement à la livraison. Une fois envoyée, la commande part sur Telegram et peut aussi être enregistrée dans la base si Supabase est configuré.
+              Paiement à la livraison. Remplissez vos informations et nous vous contacterons pour confirmer la commande.
             </div>
 
             {message ? (

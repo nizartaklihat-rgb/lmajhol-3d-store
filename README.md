@@ -21,6 +21,7 @@ A modern monochrome fashion storefront for **LMAJHOL**, built for a Moroccan cas
 - Cash-on-delivery checkout form in French
 - Telegram order notifications
 - Admin panel for adding/editing/deleting products
+- Product image upload from admin via Supabase Storage
 - Local fallback mode when Supabase is not configured yet
 
 ## Quick start
@@ -58,7 +59,8 @@ If Supabase is not configured, the storefront still works with the local seed ca
 1. Create a free Supabase project.
 2. Open the SQL editor.
 3. Paste `supabase/schema.sql` and run it.
-4. Put `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` into Netlify environment variables.
+4. Put `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally `SUPABASE_STORAGE_BUCKET` into Netlify environment variables.
+5. The first admin image upload will automatically create a public storage bucket if it does not already exist.
 
 ## Netlify deployment
 

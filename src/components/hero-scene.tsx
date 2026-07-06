@@ -71,10 +71,6 @@ function CameraRig() {
   const storyGroup = useRef<Group>(null);
   const world = useRef<Group>(null);
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-  }, []);
-
   useLayoutEffect(() => {
     if (!world.current || !heroGroup.current || !collectionGroup.current || !storyGroup.current) return;
 

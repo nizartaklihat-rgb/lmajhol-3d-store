@@ -17,6 +17,7 @@ Required:
 Recommended for live admin CRUD + saved orders:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_STORAGE_BUCKET` (`lmajhol-products` is a good default)
 
 ## 3) Supabase setup
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Product } from '@/types/store';
 import { formatPrice } from '@/lib/utils';
 
@@ -32,6 +32,7 @@ export function AdminDashboard({ initialProducts }: { initialProducts: Product[]
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (selectedId === 'new') {
@@ -123,6 +124,38 @@ export function AdminDashboard({ initialProducts }: { initialProducts: Product[]
     window.location.href = '/admin/login';
   }
 
+  async function handleImageUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setMessage('');
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('productName', draft.name || 'product');
+      formData.append('productSlug', draft.slug || draft.name || 'product');
+
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Upload impossible');
+
+      setDraft((previous) => ({ ...previous, image: data.url }));
+      setMessage('Image envoyée. N’oubliez pas de sauvegarder le produit.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur image inconnue');
+    } finally {
+      setUploadingImage(false);
+      event.target.value = '';
+    }
+  }
+
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -131,7 +164,7 @@ export function AdminDashboard({ initialProducts }: { initialProducts: Product[]
             <p className="text-xs uppercase tracking-[0.32em] text-white/40">LMAJHOL / admin privé</p>
             <h1 className="mt-4 text-4xl font-semibold text-white">Gestion des produits</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/58">
-              Ajoute, modifie ou supprime les produits visibles sur le site. Si Supabase n’est pas encore configuré, l’interface reste prête mais la sauvegarde live sera désactivée.
+              Ajoute, modifie ou supprime les produits visibles sur le site. Tu peux maintenant envoyer une vraie image produit directement depuis l’admin.
             </p>
           </div>
           <button
@@ -220,9 +253,42 @@ export function AdminDashboard({ initialProducts }: { initialProducts: Product[]
                 <input value={draft.sizesText} onChange={(e) => setDraft({ ...draft, sizesText: e.target.value })} className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition focus:border-white/24" />
               </label>
               <label className="space-y-2 text-sm text-white/65">
-                <span>Image</span>
+                <span>Image URL</span>
                 <input value={draft.image} onChange={(e) => setDraft({ ...draft, image: e.target.value })} className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition focus:border-white/24" />
               </label>
+            </div>
+
+            <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-black/20 p-4">
+              <div className="grid gap-5 lg:grid-cols-[160px_1fr] lg:items-start">
+                <div className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/5">
+                  <div className="flex aspect-[3/4] items-center justify-center bg-gradient-to-br from-white/10 to-transparent">
+                    {draft.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={draft.image} alt={draft.name || 'Prévisualisation produit'} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="px-4 text-center text-xs uppercase tracking-[0.28em] text-white/35">Aperçu image</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-white">Uploader une image produit</p>
+                    <p className="mt-1 text-sm leading-6 text-white/52">
+                      Formats acceptés: PNG, JPG, WEBP, SVG. Taille max: 5MB. L’image est envoyée dans Supabase Storage.
+                    </p>
+                  </div>
+
+                  <label className="flex cursor-pointer items-center justify-center rounded-full border border-white/16 bg-white/5 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white/28 hover:bg-white/8">
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={handleImageUpload} className="hidden" disabled={uploadingImage} />
+                    {uploadingImage ? 'Upload en cours...' : 'Choisir une image'}
+                  </label>
+
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/32">
+                    Après l’upload, clique sur <span className="text-white/58">Enregistrer</span> pour sauvegarder le produit avec la nouvelle image.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -255,7 +321,7 @@ export function AdminDashboard({ initialProducts }: { initialProducts: Product[]
             <div className="mt-6 flex flex-wrap gap-4">
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || uploadingImage}
                 className="rounded-full bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02] disabled:opacity-55"
               >
                 {saving ? 'Sauvegarde...' : selectedId === 'new' ? 'Ajouter le produit' : 'Enregistrer'}
