@@ -1,0 +1,7 @@
+<svg width="900" height="1200" viewBox="0 0 900 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1200" rx="64" fill="#F6F5F0"/>
+  <rect x="50" y="50" width="800" height="1100" rx="48" stroke="#D9D6CE" stroke-width="2"/>
+  <path d="M312 218L202 276L248 414L332 380V935H568V380L652 414L698 276L588 218L526 288C500 314 476 326 450 326C424 326 400 314 374 288L312 218Z" fill="white" stroke="#D7D5CD" stroke-width="16"/>
+  <path d="M383 258C409 284 430 294 450 294C470 294 491 284 517 258" stroke="#D7D5CD" stroke-width="16" stroke-linecap="round"/>
+  <text x="450" y="1050" text-anchor="middle" fill="#111111" font-family="Arial, Helvetica, sans-serif" font-size="42" letter-spacing="14">LMAJHOL</text>
+</svg>
