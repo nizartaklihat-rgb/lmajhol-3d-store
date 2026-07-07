@@ -1,8 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Product } from '@/types/store';
 import { formatPrice } from '@/lib/utils';
+
+function getFamilyName(product?: Product | null) {
+  if (!product) return 'Oversized Tee';
+  return product.name.replace(/\b(Blanc|Noir|White|Black)\b/gi, '').replace(/\s{2,}/g, ' ').trim() || product.name;
+}
 
 const defaultProduct = (product?: Product) => ({
   fullName: '',
@@ -58,6 +63,7 @@ export function OrderModal({
   }, [open, onClose]);
 
   const currentProduct = products.find((product) => product.id === form.productId) || selectedProduct || products[0];
+  const familyName = useMemo(() => getFamilyName(currentProduct), [currentProduct]);
 
   useEffect(() => {
     if (!currentProduct) return;
@@ -117,8 +123,8 @@ export function OrderModal({
                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">Produit sélectionné</p>
                   <div className="mt-4 flex items-end justify-between gap-4">
                     <div>
-                      <h3 className="text-2xl font-semibold text-white">{currentProduct.name}</h3>
-                      <p className="mt-2 text-sm text-white/60">{currentProduct.description}</p>
+                      <h3 className="text-2xl font-semibold text-white">{familyName}</h3>
+                      <p className="mt-2 text-sm text-white/60">Version {currentProduct.color}</p>
                     </div>
                     <p className="text-lg font-semibold text-white">{formatPrice(currentProduct.price)}</p>
                   </div>
@@ -174,6 +180,11 @@ export function OrderModal({
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2 text-sm text-white/68">
                   <span>Produit</span>
+                  <input value={familyName} readOnly className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/72 outline-none" />
+                </label>
+
+                <label className="space-y-2 text-sm text-white/68">
+                  <span>Couleur</span>
                   <select
                     value={form.productId}
                     onChange={(e) => {
@@ -191,12 +202,14 @@ export function OrderModal({
                   >
                     {products.map((product) => (
                       <option key={product.id} value={product.id} className="bg-black">
-                        {product.name}
+                        {product.color}
                       </option>
                     ))}
                   </select>
                 </label>
+              </div>
 
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2 text-sm text-white/68">
                   <span>Taille</span>
                   <select
@@ -211,9 +224,7 @@ export function OrderModal({
                     ))}
                   </select>
                 </label>
-              </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2 text-sm text-white/68">
                   <span>Quantité</span>
                   <input
@@ -225,10 +236,6 @@ export function OrderModal({
                     onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })}
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
                   />
-                </label>
-                <label className="space-y-2 text-sm text-white/68">
-                  <span>Couleur</span>
-                  <input value={form.color} readOnly className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/72 outline-none" />
                 </label>
               </div>
 

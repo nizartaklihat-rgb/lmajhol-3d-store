@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Package, ShieldCheck, Sparkles } from 'lucide-react';
 import { Product } from '@/types/store';
@@ -12,98 +12,119 @@ import { OrderModal } from '@/components/order-modal';
 
 export function Storefront({ products }: { products: Product[] }) {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(products[0] || null);
 
-  const featuredProducts = useMemo(
-    () => (products.filter((product) => product.featured).length ? products.filter((product) => product.featured) : products),
-    [products]
-  );
+  const variants = useMemo(() => {
+    const source = products.filter((product) => product.featured).length
+      ? products.filter((product) => product.featured)
+      : products;
+
+    return [...source].sort((a, b) => {
+      if (a.color.toLowerCase().includes('blanc')) return -1;
+      if (b.color.toLowerCase().includes('blanc')) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [products]);
+
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(variants[0]?.id || '');
+  const selectedVariant = variants.find((product) => product.id === selectedVariantId) || variants[0] || null;
+
+  useEffect(() => {
+    if (!selectedVariantId && variants[0]) {
+      setSelectedVariantId(variants[0].id);
+      return;
+    }
+
+    if (selectedVariantId && !variants.find((product) => product.id === selectedVariantId) && variants[0]) {
+      setSelectedVariantId(variants[0].id);
+    }
+  }, [selectedVariantId, variants]);
+
+  const availableSizes = useMemo(() => {
+    const set = new Set<string>();
+    variants.forEach((product) => product.sizes.forEach((size) => set.add(size)));
+    return [...set];
+  }, [variants]);
 
   function openOrder(product?: Product) {
-    setSelectedProduct(product || products[0] || null);
+    if (product) {
+      setSelectedVariantId(product.id);
+    }
     setIsOrderOpen(true);
   }
 
   return (
     <>
       <HeroScene />
-      <Navbar onOrderClick={() => openOrder()} />
+      <Navbar onOrderClick={() => openOrder(selectedVariant || variants[0] || undefined)} />
 
       <main className="relative overflow-x-hidden">
-        <section id="experience" className="relative flex min-h-screen items-end px-6 pb-16 pt-36 lg:px-10 lg:pb-24">
-          <div className="mx-auto grid w-full max-w-7xl gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+        <section id="experience" className="relative flex min-h-screen items-center justify-center px-6 pb-12 pt-28 lg:px-10">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center text-center">
             <motion.div
+              initial={{ opacity: 0, y: 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.85, ease: 'easeOut' }}
+              className="inline-flex items-center gap-3 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-[10px] uppercase tracking-[0.35em] text-white/55 backdrop-blur-xl"
+            >
+              <span>Casablanca</span>
+              <span className="h-1 w-1 rounded-full bg-white/45" />
+              <span>Premium essentials</span>
+            </motion.div>
+
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
-              className="max-w-3xl"
+              transition={{ duration: 0.95, delay: 0.08, ease: 'easeOut' }}
+              className="mt-8 text-center text-[4.2rem] font-semibold uppercase leading-[0.82] tracking-[-0.08em] text-white sm:text-[5.8rem] md:text-[7.6rem] xl:text-[10rem]"
             >
-              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-[10px] uppercase tracking-[0.35em] text-white/55 backdrop-blur-xl">
-                <span>Edition 01</span>
-                <span className="h-1 w-1 rounded-full bg-white/45" />
-                <span>Casablanca</span>
-              </div>
+              LMAJHOL
+            </motion.h1>
 
-              <h1 className="text-balance text-[3.5rem] font-semibold uppercase leading-[0.84] tracking-[-0.05em] text-white sm:text-[4.8rem] md:text-[6.6rem] xl:text-[8rem]">
-                Noir. Blanc.
-                <br />
-                Oversized.
-              </h1>
+            <motion.p
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.95, delay: 0.16, ease: 'easeOut' }}
+              className="mt-7 max-w-2xl text-base leading-7 text-white/62 sm:text-lg"
+            >
+              Une silhouette oversized pensée en noir et blanc. Une présence simple, propre et forte, portée par une expérience 3D plus proche d’un studio mode que d’une boutique classique.
+            </motion.p>
 
-              <p className="mt-7 max-w-xl text-base leading-7 text-white/64 sm:text-lg">
-                LMAJHOL construit une silhouette propre, ample et assumée. Une seule obsession : des t-shirts noirs et blancs qui tombent fort.
-              </p>
-
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <button
-                  onClick={() => openOrder(products[0])}
-                  className="rounded-full bg-white px-8 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
-                >
-                  Commander maintenant
-                </button>
-                <a
-                  href="#collection"
-                  className="rounded-full border border-white/16 bg-white/5 px-8 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
-                >
-                  Explorer la collection
-                </a>
-              </div>
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.95, delay: 0.24, ease: 'easeOut' }}
+              className="mt-10 flex flex-col gap-4 sm:flex-row"
+            >
+              <button
+                onClick={() => openOrder(selectedVariant || variants[0] || undefined)}
+                className="rounded-full bg-white px-8 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
+              >
+                Commander maintenant
+              </button>
+              <a
+                href="#collection"
+                className="rounded-full border border-white/16 bg-white/5 px-8 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
+              >
+                Découvrir le produit
+              </a>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 32 }}
+              initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.18, ease: 'easeOut' }}
-              className="panel rounded-[2.2rem] p-6 shadow-glow lg:ml-auto lg:max-w-md"
+              transition={{ duration: 1, delay: 0.34, ease: 'easeOut' }}
+              className="mt-14 grid w-full max-w-4xl gap-4 sm:grid-cols-3"
             >
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Signature</p>
-                <Sparkles className="h-4 w-4 text-white/65" />
-              </div>
-
-              <div className="mt-6 space-y-6">
-                <div>
-                  <p className="text-4xl font-semibold leading-tight text-white">Une présence sobre, mais chère au regard.</p>
-                  <p className="mt-3 text-sm leading-6 text-white/62">
-                    Matière visuelle sombre, profondeur 3D, mouvement au scroll et composition éditoriale pour donner à LMAJHOL une vraie présence premium.
-                  </p>
+              {[
+                ['Palette', 'Noir / Blanc'],
+                ['Produit', 'Oversized Tee'],
+                ['Paiement', 'À la livraison']
+              ].map(([label, value]) => (
+                <div key={label} className="panel rounded-[1.6rem] px-5 py-5 text-left">
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-white/38">{label}</p>
+                  <p className="mt-3 text-lg font-medium text-white">{value}</p>
                 </div>
-
-                <div className="grid gap-3 text-sm text-white/60 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Style</p>
-                    <p className="mt-2 text-white">Essential</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Fit</p>
-                    <p className="mt-2 text-white">Oversized</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/38">Delivery</p>
-                    <p className="mt-2 text-white">Cash on delivery</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </motion.div>
           </div>
         </section>
@@ -114,11 +135,11 @@ export function Storefront({ products }: { products: Product[] }) {
               <div key={index} className="flex items-center gap-10">
                 <span>LMAJHOL</span>
                 <span className="text-white/35">•</span>
+                <span>Oversized Tee</span>
+                <span className="text-white/35">•</span>
                 <span>Noir</span>
                 <span className="text-white/35">•</span>
                 <span>Blanc</span>
-                <span className="text-white/35">•</span>
-                <span>Oversized</span>
                 <span className="text-white/35">•</span>
               </div>
             ))}
@@ -135,12 +156,12 @@ export function Storefront({ products }: { products: Product[] }) {
               },
               {
                 title: 'Coupe oversized',
-                text: 'Volumes amples, présence clean et silhouette moderne.',
+                text: 'Volumes amples, tombé propre, silhouette moderne et forte.',
                 icon: Package
               },
               {
                 title: 'Commande rapide',
-                text: 'Choisissez votre taille et validez en quelques secondes.',
+                text: 'Choisissez votre couleur, votre taille et validez en quelques secondes.',
                 icon: ArrowUpRight
               }
             ].map((item, index) => (
@@ -164,119 +185,100 @@ export function Storefront({ products }: { products: Product[] }) {
           <div className="mx-auto max-w-7xl">
             <div className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-2xl">
-                <p className="text-xs uppercase tracking-[0.35em] text-white/40">Collection</p>
-                <h2 className="mt-4 text-4xl font-semibold text-white sm:text-5xl lg:text-6xl">Deux tons. Une attitude.</h2>
+                <p className="text-xs uppercase tracking-[0.35em] text-white/40">Produit</p>
+                <h2 className="mt-4 text-4xl font-semibold text-white sm:text-5xl lg:text-6xl">Oversized Tee</h2>
               </div>
               <p className="max-w-xl text-sm leading-7 text-white/58">
-                Une sélection réduite, plus forte, avec une mise en avant centrée sur la coupe, la matière et la présence visuelle.
+                Un seul produit. Deux versions. Blanc pour la netteté. Noir pour la profondeur. Même coupe, même attitude.
               </p>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-              {featuredProducts.slice(0, 1).map((product) => (
-                <motion.article
-                  key={product.id}
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.24 }}
-                  transition={{ duration: 0.7 }}
-                  className="panel relative overflow-hidden rounded-[2.4rem]"
-                >
-                  <div className="absolute right-6 top-4 text-[7rem] font-semibold leading-none tracking-[-0.08em] text-white/[0.05] sm:text-[10rem]">
-                    01
-                  </div>
-                  <div className="grid min-h-[620px] lg:grid-cols-[0.95fr_1.05fr]">
-                    <div className="relative border-b border-white/10 bg-gradient-to-br from-white/10 via-white/[0.03] to-transparent lg:border-b-0 lg:border-r">
-                      <div className="absolute inset-0 bg-grain opacity-90" />
-                      <div className="relative flex h-full items-center justify-center p-10 sm:p-14">
-                        <Image src={product.image} alt={product.name} width={720} height={940} className="h-auto max-h-[520px] w-auto drop-shadow-[0_40px_120px_rgba(255,255,255,0.08)]" />
-                      </div>
-                    </div>
-                    <div className="flex flex-col justify-between p-8 sm:p-10">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-white/36">{product.color}</p>
-                        <h3 className="mt-4 text-4xl font-semibold leading-tight text-white sm:text-5xl">{product.name}</h3>
-                        <p className="mt-5 text-2xl font-semibold text-white">{formatPrice(product.price)}</p>
-                        <p className="mt-8 max-w-xl text-sm leading-7 text-white/58">{product.description}</p>
-                        <p className="mt-5 text-sm leading-7 text-white/70">{product.materials}</p>
-                        <div className="mt-8 flex flex-wrap gap-2">
-                          {product.sizes.map((size) => (
-                            <span key={size} className="rounded-full border border-white/14 px-4 py-2 text-xs uppercase tracking-[0.28em] text-white/65">
-                              {size}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+            {selectedVariant ? (
+              <motion.article
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7 }}
+                className="panel relative overflow-hidden rounded-[2.6rem]"
+              >
+                <div className="absolute right-6 top-4 text-[7rem] font-semibold leading-none tracking-[-0.08em] text-white/[0.05] sm:text-[10rem]">
+                  01
+                </div>
 
-                      <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                        <button
-                          onClick={() => openOrder(product)}
-                          className="rounded-full bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
-                        >
-                          Commander
-                        </button>
-                        <button
-                          onClick={() => openOrder(product)}
-                          className="rounded-full border border-white/16 bg-white/5 px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
-                        >
-                          Choisir la taille
-                        </button>
-                      </div>
+                <div className="grid min-h-[680px] lg:grid-cols-[1fr_0.92fr]">
+                  <div className="relative border-b border-white/10 bg-gradient-to-br from-white/10 via-white/[0.03] to-transparent lg:border-b-0 lg:border-r">
+                    <div className="absolute inset-0 bg-grain opacity-90" />
+                    <div className="relative flex h-full items-center justify-center p-8 sm:p-12 lg:p-16">
+                      <Image
+                        src={selectedVariant.image}
+                        alt={selectedVariant.name}
+                        width={880}
+                        height={1100}
+                        className="h-auto max-h-[560px] w-auto drop-shadow-[0_45px_120px_rgba(255,255,255,0.09)]"
+                      />
                     </div>
                   </div>
-                </motion.article>
-              ))}
 
-              <div className="grid gap-8">
-                {featuredProducts.slice(1).map((product, index) => (
-                  <motion.article
-                    key={product.id}
-                    initial={{ opacity: 0, y: 32 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.24 }}
-                    transition={{ duration: 0.7, delay: index * 0.08 }}
-                    className="panel relative overflow-hidden rounded-[2.2rem] p-7 sm:p-8"
-                  >
-                    <div className="absolute right-5 top-3 text-[5rem] font-semibold leading-none tracking-[-0.08em] text-white/[0.05]">
-                      02
-                    </div>
-                    <div className="relative flex min-h-[520px] flex-col justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-white/36">{product.color}</p>
-                        <h3 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">{product.name}</h3>
-                        <p className="mt-4 text-lg font-semibold text-white">{formatPrice(product.price)}</p>
-                      </div>
-
-                      <div className="relative my-8 flex justify-center rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 via-transparent to-transparent p-8">
-                        <Image src={product.image} alt={product.name} width={520} height={700} className="h-auto max-h-[340px] w-auto drop-shadow-[0_35px_100px_rgba(255,255,255,0.08)]" />
-                      </div>
-
-                      <div>
-                        <p className="text-sm leading-7 text-white/58">{product.description}</p>
-                        <div className="mt-6 flex flex-wrap gap-2">
-                          {product.sizes.map((size) => (
-                            <span key={size} className="rounded-full border border-white/14 px-4 py-2 text-xs uppercase tracking-[0.28em] text-white/65">
-                              {size}
-                            </span>
-                          ))}
+                  <div className="flex flex-col justify-between p-8 sm:p-10 lg:p-12">
+                    <div>
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.3em] text-white/36">LMAJHOL / Essential</p>
+                          <h3 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">{selectedVariant.name}</h3>
                         </div>
-                        <button
-                          onClick={() => openOrder(product)}
-                          className="mt-8 rounded-full bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
-                        >
-                          Commander
-                        </button>
+                        <p className="text-2xl font-semibold text-white">{formatPrice(selectedVariant.price)}</p>
+                      </div>
+
+                      <div className="mt-8 flex flex-wrap gap-3">
+                        {variants.map((variant) => {
+                          const active = variant.id === selectedVariant.id;
+                          return (
+                            <button
+                              key={variant.id}
+                              onClick={() => setSelectedVariantId(variant.id)}
+                              className={`rounded-full border px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition ${active ? 'border-white bg-white text-black' : 'border-white/14 bg-white/5 text-white hover:border-white/28 hover:bg-white/8'}`}
+                            >
+                              {variant.color}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <p className="mt-8 max-w-xl text-sm leading-7 text-white/58">{selectedVariant.description}</p>
+                      <p className="mt-5 max-w-xl text-sm leading-7 text-white/68">{selectedVariant.materials}</p>
+
+                      <div className="mt-8 flex flex-wrap gap-2">
+                        {availableSizes.map((size) => (
+                          <span key={size} className="rounded-full border border-white/14 px-4 py-2 text-xs uppercase tracking-[0.28em] text-white/65">
+                            {size}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  </motion.article>
-                ))}
-              </div>
-            </div>
+
+                    <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                      <button
+                        onClick={() => openOrder(selectedVariant)}
+                        className="rounded-full bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
+                      >
+                        Commander
+                      </button>
+                      <a
+                        href="#order"
+                        className="rounded-full border border-white/16 bg-white/5 px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
+                      >
+                        Livraison & commande
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+            ) : null}
           </div>
         </section>
 
         <section id="story" className="px-6 py-24 lg:px-10">
-          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.08fr_0.92fr]">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -285,10 +287,10 @@ export function Storefront({ products }: { products: Product[] }) {
             >
               <p className="text-xs uppercase tracking-[0.32em] text-white/40">L’esprit LMAJHOL</p>
               <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-                Une marque courte en mots, forte en présence.
+                Une identité courte en mots, forte en silhouette.
               </h2>
               <p className="mt-6 max-w-2xl text-sm leading-7 text-white/58">
-                LMAJHOL avance avec une direction très claire : de l’espace, du noir, du blanc, de la coupe, et une sensation plus proche d’un studio mode que d’une boutique classique.
+                LMAJHOL prend de l’espace sans parler trop fort : noir profond, blanc net, matière visuelle dense et coupe ample pour laisser la présence du vêtement dominer.
               </p>
             </motion.div>
 
@@ -307,12 +309,12 @@ export function Storefront({ products }: { products: Product[] }) {
                 {
                   label: '03',
                   title: 'Détails sobres',
-                  text: 'Moins d’éléments, plus d’impact, avec une lecture simple et premium.'
+                  text: 'Peu d’éléments, plus d’impact, avec une lecture simple et premium.'
                 },
                 {
                   label: '04',
                   title: 'Commande directe',
-                  text: 'Choisissez votre modèle, vos infos et validez sans friction.'
+                  text: 'Choisissez votre version, votre taille et validez sans friction.'
                 }
               ].map((item, index) => (
                 <motion.div
@@ -338,15 +340,15 @@ export function Storefront({ products }: { products: Product[] }) {
               <div>
                 <p className="text-xs uppercase tracking-[0.35em] text-white/40">Commande / Maroc</p>
                 <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-                  Choisissez votre tee et passez votre commande en quelques instants.
+                  Choisissez votre version et passez votre commande en quelques instants.
                 </h2>
                 <p className="mt-5 max-w-2xl text-sm leading-7 text-white/58">
-                  Sélectionnez votre couleur, votre taille, vos coordonnées, puis validez. Nous vous recontacterons pour confirmer.
+                  Sélectionnez blanc ou noir, choisissez votre taille, laissez vos coordonnées puis validez. Nous vous recontacterons pour confirmer.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <button
-                  onClick={() => openOrder(products[0])}
+                  onClick={() => openOrder(selectedVariant || variants[0] || undefined)}
                   className="rounded-full bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:scale-[1.02]"
                 >
                   Ouvrir le formulaire
@@ -355,7 +357,7 @@ export function Storefront({ products }: { products: Product[] }) {
                   href="#collection"
                   className="rounded-full border border-white/16 bg-white/5 px-6 py-4 text-center text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white/28 hover:bg-white/8"
                 >
-                  Voir les produits
+                  Revoir le produit
                 </a>
               </div>
             </div>
@@ -366,15 +368,15 @@ export function Storefront({ products }: { products: Product[] }) {
       <footer className="px-6 pb-8 lg:px-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-xs uppercase tracking-[0.28em] text-white/35 sm:flex-row sm:items-center sm:justify-between">
           <p>LMAJHOL — Oversized essentials</p>
-          <p>Noir / Blanc / Paiement à la réception</p>
+          <p>One tee / Two versions / Cash on delivery</p>
         </div>
       </footer>
 
       <OrderModal
         open={isOrderOpen}
         onClose={() => setIsOrderOpen(false)}
-        products={products}
-        selectedProduct={selectedProduct}
+        products={variants}
+        selectedProduct={selectedVariant}
       />
     </>
   );
